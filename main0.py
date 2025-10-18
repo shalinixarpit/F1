@@ -28,8 +28,8 @@ active_jobs = {}
 print("🔄 All active jobs cleared on startup.")
 
 # fixed channels
-LOG_CHANNEL = "-1002980130177"     # log channel
-DEST_CHANNEL = "-1003070910589"   # destination channel
+LOG_CHANNEL = "-1002552054520"     # log channel
+DEST_CHANNEL = "-1002908898282"   # destination channel
 
 # ——————————————————————————————————————————————
 # Helper Functions
