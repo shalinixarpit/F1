@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 8000
 
 # Start the application
-CMD flask run -h 0.0.0.0 -p 8000 & python3 main.py
+CMD flask run -h 0.0.0.0 -p 8000 & python3 main0.py
