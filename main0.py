@@ -128,11 +128,11 @@ async def start_batch(c: Client, m: Message):
                 status = f"{current_index+1}/{total_count}: {result}"
 
             await progress_msg.edit(status)
-            await asyncio.sleep(3)
+            await asyncio.sleep(0)
 
         if batch_offset + batch_size < total_count:
             await progress_msg.edit(f"Sent {batch_offset + batch_size}/{total_count} — sleeping 30 s… 💤")
-            await asyncio.sleep(3)
+            await asyncio.sleep(30)
 
     active_jobs.pop(user_id, None)
     await m.reply_text(f"✅ All done! ({sent_success}/{total_count} succeeded)", quote=True)
