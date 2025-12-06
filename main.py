@@ -53,7 +53,7 @@ async def start_forwarding(c: Client, m: Message):
         active_jobs.pop(user_id, None)
         return await m.reply("❗ Only public channel links are supported.", quote=True)
 
-    dest_chat = "-1003148825822"  # 🔹 Your destination chat ID
+    dest_chat = "-1002927666549"  # 🔹 Your destination chat ID
     total_count = 100000              # 🔹 Number of messages to forward
     batch_size = 20                # 🔹 Send 20 messages at a time
     rest_time = 30                 # 🔹 Wait 30 seconds between batches
