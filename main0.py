@@ -5,7 +5,7 @@ import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from config import API_ID, API_HASH, BOT_TOKEN, SESSION
+from config import API_ID, API_HASH, BOT_TOKEN, SESSION, LOG_CHANNEL, DEST_CHANNEL
 
 # ——————————————————————————————————————————————
 # Initialize Bot and User Clients
@@ -27,9 +27,6 @@ user = Client(
 active_jobs = {}
 print("🔄 All active jobs cleared on startup.")
 
-# fixed channels
-LOG_CHANNEL = "-1002552054520"     # log channel
-DEST_CHANNEL = "-1002908898282"   # destination channel
 
 # ——————————————————————————————————————————————
 # Helper Functions
@@ -57,15 +54,14 @@ async def forward_or_send(bot_client, user_client, msg, dest_chat, link_type):
         if msg.media:
             if link_type == "private":
                 path = await user_client.download_media(msg)
-                # send to main dest
                 await bot_client.send_document(dest_chat, path)
-                # send to log channel
                 await bot_client.send_document(LOG_CHANNEL, path)
                 O.remove(path)
             else:
                 await msg.copy(chat_id=dest_chat)
                 await msg.copy(chat_id=LOG_CHANNEL)
             return "Done"
+
         elif msg.text:
             if link_type == "private":
                 await bot_client.send_message(dest_chat, msg.text)
@@ -74,10 +70,13 @@ async def forward_or_send(bot_client, user_client, msg, dest_chat, link_type):
                 await msg.copy(chat_id=dest_chat)
                 await msg.copy(chat_id=LOG_CHANNEL)
             return "Done"
+
         else:
             return "Skipped"
+
     except Exception as e:
         return f"Error: {e}"
+
 
 # ——————————————————————————————————————————————
 # Commands
@@ -104,8 +103,8 @@ async def start_batch(c: Client, m: Message):
         active_jobs.pop(user_id, None)
         return await m.reply_text("❗️ Invalid Telegram link.", quote=True)
 
-    total_count = 1000       # max messages to process
-    batch_size = 20          # messages per batch (skip bhi count honge)
+    total_count = 1000
+    batch_size = 20
     sent_success = 0
 
     progress_msg = await m.reply_text("Starting batch… 🐥", quote=True)
@@ -118,6 +117,7 @@ async def start_batch(c: Client, m: Message):
 
             current_index = batch_offset + i
             msg_id = start_id + current_index
+
             msg = await fetch_message(bot, user, chat_id, msg_id, link_type)
             if not msg:
                 status = f"{current_index+1}/{total_count}: ❌ not found"
@@ -127,7 +127,11 @@ async def start_batch(c: Client, m: Message):
                     sent_success += 1
                 status = f"{current_index+1}/{total_count}: {result}"
 
-            await progress_msg.edit(status)
+            try:
+                await progress_msg.edit(status)
+            except:  # Floodwait fix
+                pass
+
             await asyncio.sleep(1)
 
         if batch_offset + batch_size < total_count:
@@ -146,6 +150,7 @@ async def cancel_batch(c: Client, m: Message):
         await m.reply("🛑 Cancelling process... Done.")
     else:
         await m.reply("❗ No active job found.")
+
 
 # ——————————————————————————————————————————————
 # Run bot
